@@ -162,6 +162,38 @@
             - 결과
                 
                 ![4.PNG](4.png)
+
+    - 회원가입 방식 구분
+    - 회원 테이블에 type 컬럼을 추가하여 구분한다.
+    - 회원가입 시 type을 지정하여 회원가입 되도록 설정한다.
+    - 0: 비밀번호 방식 1: 구글 로그인 2: 네이버 로그인
+    
+    ```jsx
+    const naverVerify = async (profile) => {
+        const email = profile.email;
+        const user = await prisma.user.findFirst({where: {email}});
+    
+        if(user !== null) {
+            return {id: user.id, email: user.email, username: user.username};
+        }
+    
+        const created = await prisma.user.create({
+            data: {
+                email,
+                username: profile.nickname,
+                gender: -1,
+                address: "추후 수정",
+                phoneNumber: profile.mobile,
+                birth: new Date(1971, 0, 1),
+                type: 2, //타입 지정
+            }
+        });
+    
+        return {id: created.id, email: created.email, username: created.username};
+    };
+    ```
+    
+    이후 로그인 검증 과정에서 해당 타입을 확인하여 회원가입 방식을 유지한다.
                 
     - JWT
         - JWT란 인증에 필요한 정보들을 암호화시킨 JSON 토큰이다.
